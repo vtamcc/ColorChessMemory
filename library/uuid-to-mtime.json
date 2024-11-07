@@ -1,7 +1,7 @@
 {
   "a8a1c8c7-07d9-4d7c-ac9c-0cc72c7f2e1a": {
-    "asset": 1730864745839,
-    "meta": 1730943858020,
+    "asset": 1730976655508,
+    "meta": 1730976725794,
     "relativePath": "ColorMemoryChess"
   },
   "91afb787-7cc4-478f-894b-4779c16418e9": {
@@ -20,8 +20,8 @@
     "relativePath": "ColorMemoryChess/scene"
   },
   "da937be5-8535-48ee-bb73-7c0724be9737": {
-    "asset": 1730965394115,
-    "meta": 1730965394120,
+    "asset": 1730977239025,
+    "meta": 1730977239028,
     "relativePath": "ColorMemoryChess/scene/main.fire"
   },
   "370a3110-792e-49c7-8c99-9cafeba3e4bb": {
@@ -230,8 +230,8 @@
     "relativePath": "ColorMemoryChess/res/img/demo/SETTING.png"
   },
   "77afc26b-46d5-493e-b342-13ae7e97d728": {
-    "asset": 1730885713619,
-    "meta": 1730943858021,
+    "asset": 1730955369655,
+    "meta": 1730976725795,
     "relativePath": "ColorMemoryChess/res/animation"
   },
   "23a09b71-56e4-487c-b7f2-d1b54eea2526": {
@@ -809,14 +809,14 @@
     "meta": 1730955389396,
     "relativePath": "ColorMemoryChess/res/animation/ani_dice6.anim"
   },
-  "ba8ded5b-f826-4cca-bcb4-c1308912a6d9": {
-    "asset": 1730976148194,
-    "meta": 1730976162123,
-    "relativePath": "ColorMemoryChess/scripts/MemoryChess_GamePlay.ts"
-  },
   "2fa1dd1b-c28a-420b-93b6-c7c2f2824a9a": {
     "asset": 1730976160158,
     "meta": 1730976162129,
     "relativePath": "ColorMemoryChess/scripts/MemoryChess_Item.ts"
+  },
+  "ba8ded5b-f826-4cca-bcb4-c1308912a6d9": {
+    "asset": 1730977236856,
+    "meta": 1730977238707,
+    "relativePath": "ColorMemoryChess/scripts/MemoryChess_GamePlay.ts"
   }
 }

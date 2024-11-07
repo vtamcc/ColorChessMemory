@@ -137,10 +137,24 @@ var MemoryChess_GamePlay = /** @class */ (function (_super) {
         var centerX = 0;
         var centerY = 0;
         node.zIndex = 100;
-        disableNode.active = false;
+        //disableNode.active = false;
+        // cc.tween(node)
+        //     .to(0.5, { x: centerX, y: centerY, scale: 1.5 })
+        //     .call(() => {
+        //         this.scheduleOnce(() => {
+        //             node.destroy();
+        //         }, 0.5)
+        //     })
+        //     .start();
         cc.tween(node)
             .to(0.5, { x: centerX, y: centerY, scale: 1.5 })
             .call(function () {
+            cc.tween(disableNode)
+                .to(0.5, { y: disableNode.y + 65 })
+                .call(function () {
+                disableNode.active = false;
+            })
+                .start();
             _this.scheduleOnce(function () {
                 node.destroy();
             }, 0.5);
@@ -153,13 +167,25 @@ var MemoryChess_GamePlay = /** @class */ (function (_super) {
         var originalX = node.x;
         var originalY = node.y;
         node.zIndex = 100;
-        disableNode.active = false;
+        //disableNode.active = false;
+        // cc.tween(node)
+        //     .to(0.5, { x: centerX, y: centerY, scale: 1.5 })
+        //     .delay(0.5)
+        //     .call(() => {
+        //         disableNode.active = true;
+        //     })
+        //     .to(0.5, { x: originalX, y: originalY, scale: 1.0 })
+        //     .start();
         cc.tween(node)
             .to(0.5, { x: centerX, y: centerY, scale: 1.5 })
-            .delay(0.5)
             .call(function () {
-            disableNode.active = true;
+            cc.tween(disableNode)
+                .to(0.5, { y: disableNode.y + 65 })
+                .delay(0.5)
+                .to(0.5, { y: 0 })
+                .start();
         })
+            .delay(0.5)
             .to(0.5, { x: originalX, y: originalY, scale: 1.0 })
             .start();
     };

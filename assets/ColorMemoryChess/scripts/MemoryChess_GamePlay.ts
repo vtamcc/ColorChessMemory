@@ -139,15 +139,32 @@ export default class MemoryChess_GamePlay extends cc.Component {
         let centerX = 0;
         let centerY = 0;
         node.zIndex = 100;
-        disableNode.active = false;
+        //disableNode.active = false;
+        // cc.tween(node)
+        //     .to(0.5, { x: centerX, y: centerY, scale: 1.5 })
+        //     .call(() => {
+        //         this.scheduleOnce(() => {
+        //             node.destroy();
+        //         }, 0.5)
+        //     })
+        //     .start();
+
         cc.tween(node)
-            .to(0.5, { x: centerX, y: centerY, scale: 1.5 })
-            .call(() => {
-                this.scheduleOnce(() => {
-                    node.destroy();
-                }, 0.5)
-            })
-            .start();
+        .to(0.5, { x: centerX, y: centerY, scale: 1.5 })
+        .call(() => {
+            
+            cc.tween(disableNode)
+                .to(0.5, { y: disableNode.y + 65 })  
+                .call(() => {
+                    disableNode.active = false;  
+                })
+                .start();
+            
+            this.scheduleOnce(() => {
+                node.destroy();
+            }, 0.5);
+        })
+        .start();
     }
 
 
@@ -158,15 +175,27 @@ export default class MemoryChess_GamePlay extends cc.Component {
         let originalX = node.x;
         let originalY = node.y;
         node.zIndex = 100;
-        disableNode.active = false;
+        //disableNode.active = false;
+        // cc.tween(node)
+        //     .to(0.5, { x: centerX, y: centerY, scale: 1.5 })
+        //     .delay(0.5)
+        //     .call(() => {
+        //         disableNode.active = true;
+        //     })
+        //     .to(0.5, { x: originalX, y: originalY, scale: 1.0 })
+        //     .start();
         cc.tween(node)
-            .to(0.5, { x: centerX, y: centerY, scale: 1.5 })
-            .delay(0.5)
-            .call(() => {
-                disableNode.active = true;
-            })
-            .to(0.5, { x: originalX, y: originalY, scale: 1.0 })
-            .start();
+        .to(0.5, { x: centerX, y: centerY, scale: 1.5 })
+        .call(() => {
+            cc.tween(disableNode)
+                .to(0.5, { y: disableNode.y + 65 })
+                .delay(0.5)
+                .to(0.5, { y: 0})
+                .start();
+        })
+        .delay(0.5)
+        .to(0.5, { x: originalX, y: originalY, scale: 1.0 })
+        .start();
     }
 
     checkIdColor(idColor, node, disableNode) {
