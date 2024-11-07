@@ -1,0 +1,28 @@
+{
+  "__type__": "cc.SpriteFrame",
+  "content": {
+    "name": "CHESS_BLUE",
+    "texture": "f0e3c53c-7fbf-4b1e-a4ee-95b8929bc0a8",
+    "atlas": "",
+    "rect": [
+      0,
+      0,
+      155,
+      170
+    ],
+    "offset": [
+      0,
+      0
+    ],
+    "originalSize": [
+      155,
+      170
+    ],
+    "capInsets": [
+      0,
+      0,
+      0,
+      0
+    ]
+  }
+}

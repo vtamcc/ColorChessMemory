@@ -1,0 +1,28 @@
+{
+  "__type__": "cc.SpriteFrame",
+  "content": {
+    "name": "dice_7",
+    "texture": "eb8c9ca4-e78f-4049-9961-c28521736a70",
+    "atlas": "",
+    "rect": [
+      0,
+      0,
+      430,
+      475
+    ],
+    "offset": [
+      -1,
+      0
+    ],
+    "originalSize": [
+      432,
+      475
+    ],
+    "capInsets": [
+      0,
+      0,
+      0,
+      0
+    ]
+  }
+}

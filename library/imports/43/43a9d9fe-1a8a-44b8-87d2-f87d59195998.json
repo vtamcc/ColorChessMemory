@@ -1,0 +1,28 @@
+{
+  "__type__": "cc.SpriteFrame",
+  "content": {
+    "name": "CHESS_PURPLE",
+    "texture": "2d0de13e-c037-491b-84ce-ac033dc9db8e",
+    "atlas": "",
+    "rect": [
+      0,
+      0,
+      154,
+      170
+    ],
+    "offset": [
+      0,
+      0
+    ],
+    "originalSize": [
+      154,
+      170
+    ],
+    "capInsets": [
+      0,
+      0,
+      0,
+      0
+    ]
+  }
+}
