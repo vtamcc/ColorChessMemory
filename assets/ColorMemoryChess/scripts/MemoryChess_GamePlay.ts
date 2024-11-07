@@ -35,7 +35,7 @@ export default class MemoryChess_GamePlay extends cc.Component {
     listIdColor = [];
     isClick = false;
     isClickItem = false;
-
+    isPlayerTurn = true;
     // LIFE-CYCLE CALLBACKS:
 
     onLoad() {
@@ -43,9 +43,29 @@ export default class MemoryChess_GamePlay extends cc.Component {
         this.randomColor();
         this.shuffle();
         this.renItem();
-
+        this.startPlayerTurn();
     }
 
+    startPlayerTurn() {
+        console.log("Luot cua nguoi choi ");
+        this.isPlayerTurn = true;
+        this.isClick = false;
+    }
+
+    endPlayerTurn() {
+        this.isClick = true;
+        this.scheduleOnce(() => {
+            this.startTurnBot();
+        },2.5)
+    }
+
+    startTurnBot() {
+        console.log("Luot cua nguoi Bot ");
+        this.isClick = false;
+        this.clickRoll();
+        console.log("lengt ", this.node.children.length);
+        let ramdomIndex = Math.floor(Math.random() * this.nodeItem.children.length);
+    } 
 
     randomColor() {
         for (let i = 0; i < MemoryChess_Global.arrColor.length; i++) {
@@ -104,13 +124,14 @@ export default class MemoryChess_GamePlay extends cc.Component {
             let x = startX + col * (item.node.width + cellSpacing);
             let y = startY - row * (item.node.height + cellSpacing);
             item.node.setPosition(x, y);
-            this.moveChessBack(item.sprItemBack);
+            let delay = i * 0.2; 
+            this.moveChessBack(item.sprItemBack,delay);
             this.nodeItem.addChild(item.node);
         }
     }
 
     clickRoll() {
-        if (this.isClick) {
+        if (this.isClick || !this.isPlayerTurn) {
             return;
         }
         let idColor = Math.floor(Math.random() * 6) + 1;
@@ -125,14 +146,15 @@ export default class MemoryChess_GamePlay extends cc.Component {
 
 
     }
-
-    moveChessBack(node) {
+    
+    moveChessBack(node, delay) {
         let originalY = node.y;
         cc.tween(node)
-        .to(0.5, {y: 68 })
-        .delay(0.5)
-        .to(0.5, {y: originalY})
-        .start();
+            .delay(delay)
+            .to(0.5, { y: 68 })
+            .delay(1)
+            .to(0.5, { y: originalY })
+            .start();
     }
 
     moveToCenterAndDestroy(node, disableNode) {
@@ -154,15 +176,15 @@ export default class MemoryChess_GamePlay extends cc.Component {
         .call(() => {
             
             cc.tween(disableNode)
-                .to(0.5, { y: disableNode.y + 65 })  
+                .to(0.5, { y: disableNode.y + 65 })
+                .delay(0.5)
+                .to(0.5, {y: 0})
+                .delay(0.8) 
                 .call(() => {
                     disableNode.active = false;  
+                    node.destroy();
                 })
                 .start();
-            
-            this.scheduleOnce(() => {
-                node.destroy();
-            }, 0.5);
         })
         .start();
     }
@@ -186,6 +208,7 @@ export default class MemoryChess_GamePlay extends cc.Component {
         //     .start();
         cc.tween(node)
         .to(0.5, { x: centerX, y: centerY, scale: 1.5 })
+        .delay(0.5)
         .call(() => {
             cc.tween(disableNode)
                 .to(0.5, { y: disableNode.y + 65 })
@@ -193,8 +216,11 @@ export default class MemoryChess_GamePlay extends cc.Component {
                 .to(0.5, { y: 0})
                 .start();
         })
-        .delay(0.5)
+        .delay(1.5)
         .to(0.5, { x: originalX, y: originalY, scale: 1.0 })
+        .call(() => {
+            node.zIndex = 1;
+        })
         .start();
     }
 
@@ -225,6 +251,10 @@ export default class MemoryChess_GamePlay extends cc.Component {
 
         console.log("listColor ", this.listColor);
         this.listIdColor = [];
+
+        if (this.isPlayerTurn) {
+            this.endPlayerTurn();
+        }
     }
 
     

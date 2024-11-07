@@ -47,6 +47,7 @@ var MemoryChess_GamePlay = /** @class */ (function (_super) {
         _this.listIdColor = [];
         _this.isClick = false;
         _this.isClickItem = false;
+        _this.isPlayerTurn = true;
         return _this;
         // update (dt) {}
     }
@@ -57,6 +58,26 @@ var MemoryChess_GamePlay = /** @class */ (function (_super) {
         this.randomColor();
         this.shuffle();
         this.renItem();
+        this.startPlayerTurn();
+    };
+    MemoryChess_GamePlay.prototype.startPlayerTurn = function () {
+        console.log("Luot cua nguoi choi ");
+        this.isPlayerTurn = true;
+        this.isClick = false;
+    };
+    MemoryChess_GamePlay.prototype.endPlayerTurn = function () {
+        var _this = this;
+        this.isClick = true;
+        this.scheduleOnce(function () {
+            _this.startTurnBot();
+        }, 2.5);
+    };
+    MemoryChess_GamePlay.prototype.startTurnBot = function () {
+        console.log("Luot cua nguoi Bot ");
+        this.isClick = false;
+        this.clickRoll();
+        console.log("lengt ", this.node.children.length);
+        var ramdomIndex = Math.floor(Math.random() * this.nodeItem.children.length);
     };
     MemoryChess_GamePlay.prototype.randomColor = function () {
         for (var i = 0; i < MemoryChess_Global_1.default.arrColor.length; i++) {
@@ -108,12 +129,13 @@ var MemoryChess_GamePlay = /** @class */ (function (_super) {
             var x = startX + col * (item.node.width + cellSpacing);
             var y = startY - row * (item.node.height + cellSpacing);
             item.node.setPosition(x, y);
-            this.moveChessBack(item.sprItemBack);
+            var delay = i * 0.2;
+            this.moveChessBack(item.sprItemBack, delay);
             this.nodeItem.addChild(item.node);
         }
     };
     MemoryChess_GamePlay.prototype.clickRoll = function () {
-        if (this.isClick) {
+        if (this.isClick || !this.isPlayerTurn) {
             return;
         }
         var idColor = Math.floor(Math.random() * 6) + 1;
@@ -124,16 +146,16 @@ var MemoryChess_GamePlay = /** @class */ (function (_super) {
         this.isClick = true;
         console.log('isClick ', this.isClick);
     };
-    MemoryChess_GamePlay.prototype.moveChessBack = function (node) {
+    MemoryChess_GamePlay.prototype.moveChessBack = function (node, delay) {
         var originalY = node.y;
         cc.tween(node)
+            .delay(delay)
             .to(0.5, { y: 68 })
-            .delay(0.5)
+            .delay(1)
             .to(0.5, { y: originalY })
             .start();
     };
     MemoryChess_GamePlay.prototype.moveToCenterAndDestroy = function (node, disableNode) {
-        var _this = this;
         var centerX = 0;
         var centerY = 0;
         node.zIndex = 100;
@@ -151,13 +173,14 @@ var MemoryChess_GamePlay = /** @class */ (function (_super) {
             .call(function () {
             cc.tween(disableNode)
                 .to(0.5, { y: disableNode.y + 65 })
+                .delay(0.5)
+                .to(0.5, { y: 0 })
+                .delay(0.8)
                 .call(function () {
                 disableNode.active = false;
+                node.destroy();
             })
                 .start();
-            _this.scheduleOnce(function () {
-                node.destroy();
-            }, 0.5);
         })
             .start();
     };
@@ -178,6 +201,7 @@ var MemoryChess_GamePlay = /** @class */ (function (_super) {
         //     .start();
         cc.tween(node)
             .to(0.5, { x: centerX, y: centerY, scale: 1.5 })
+            .delay(0.5)
             .call(function () {
             cc.tween(disableNode)
                 .to(0.5, { y: disableNode.y + 65 })
@@ -185,8 +209,11 @@ var MemoryChess_GamePlay = /** @class */ (function (_super) {
                 .to(0.5, { y: 0 })
                 .start();
         })
-            .delay(0.5)
+            .delay(1.5)
             .to(0.5, { x: originalX, y: originalY, scale: 1.0 })
+            .call(function () {
+            node.zIndex = 1;
+        })
             .start();
     };
     MemoryChess_GamePlay.prototype.checkIdColor = function (idColor, node, disableNode) {
@@ -209,6 +236,9 @@ var MemoryChess_GamePlay = /** @class */ (function (_super) {
         }
         console.log("listColor ", this.listColor);
         this.listIdColor = [];
+        if (this.isPlayerTurn) {
+            this.endPlayerTurn();
+        }
     };
     MemoryChess_GamePlay.prototype.onClickBack = function () {
         this.node.destroy();

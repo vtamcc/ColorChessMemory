@@ -30,7 +30,7 @@ export default class MemoryChess_Item extends cc.Component {
 
     setData(id) {
         this.id = id;
-        this.label.string = id + ' ';
+        //this.label.string = id + ' ';
         this.sprItem.spriteFrame = MemoryChess_GamePlay.instance.listSpfChess[id];
         //this.sprItem.spriteFrame = 
 
@@ -42,8 +42,11 @@ export default class MemoryChess_Item extends cc.Component {
     clickItem() {
         if (MemoryChess_GamePlay.instance.isClickItem) {
             MemoryChess_GamePlay.instance.checkIdColor(this.id, this.node, this.sprItemBack)
-            MemoryChess_GamePlay.instance.isClick = false;
+           
             MemoryChess_GamePlay.instance.isClickItem = false;
+            this.scheduleOnce(() => {
+                MemoryChess_GamePlay.instance.isClick = false;
+            },1.5)
             //     console.log("is click ",  MemoryChess_GamePlay.instance.isClick )
         } else {
             console.log("Chua click xuc xac ");

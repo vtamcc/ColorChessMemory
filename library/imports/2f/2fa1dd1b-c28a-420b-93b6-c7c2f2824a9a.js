@@ -44,15 +44,17 @@ var MemoryChess_Item = /** @class */ (function (_super) {
     };
     MemoryChess_Item.prototype.setData = function (id) {
         this.id = id;
-        this.label.string = id + ' ';
+        //this.label.string = id + ' ';
         this.sprItem.spriteFrame = MemoryChess_GamePlay_1.default.instance.listSpfChess[id];
         //this.sprItem.spriteFrame = 
     };
     MemoryChess_Item.prototype.clickItem = function () {
         if (MemoryChess_GamePlay_1.default.instance.isClickItem) {
             MemoryChess_GamePlay_1.default.instance.checkIdColor(this.id, this.node, this.sprItemBack);
-            MemoryChess_GamePlay_1.default.instance.isClick = false;
             MemoryChess_GamePlay_1.default.instance.isClickItem = false;
+            this.scheduleOnce(function () {
+                MemoryChess_GamePlay_1.default.instance.isClick = false;
+            }, 1.5);
             //     console.log("is click ",  MemoryChess_GamePlay.instance.isClick )
         }
         else {
