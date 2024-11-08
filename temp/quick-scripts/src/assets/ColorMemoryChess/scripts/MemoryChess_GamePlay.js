@@ -29,6 +29,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+var MemoryChess_GameOver_1 = require("./MemoryChess_GameOver");
 var MemoryChess_Global_1 = require("./MemoryChess_Global");
 var MemoryChess_Item_1 = require("./MemoryChess_Item");
 var _a = cc._decorator, ccclass = _a.ccclass, property = _a.property;
@@ -42,23 +43,50 @@ var MemoryChess_GamePlay = /** @class */ (function (_super) {
         _this.spfDice = null;
         _this.listSpfChess = [];
         _this.listAnimation = [];
+        _this.prfGameOver = null;
+        _this.lbTime = null;
+        _this.lbHeart = null;
         _this.numCircles = 3;
         _this.listColor = [];
         _this.listIdColor = [];
-        _this.isClick = false;
+        _this.isClick = true;
         _this.isClickItem = false;
         _this.isPlayerTurn = true;
+        _this.time = 3;
         return _this;
         // update (dt) {}
     }
     MemoryChess_GamePlay_1 = MemoryChess_GamePlay;
     // LIFE-CYCLE CALLBACKS:
     MemoryChess_GamePlay.prototype.onLoad = function () {
+        var _this = this;
+        console.log("heart ", MemoryChess_Global_1.default.heart);
         MemoryChess_GamePlay_1.instance = this;
         this.randomColor();
         this.shuffle();
         this.renItem();
-        this.startPlayerTurn();
+        this.updateLbHeart();
+        //this.startPlayerTurn();
+        this.scheduleOnce(function () {
+            _this.startCountDown();
+        }, 5.5);
+        console.log("iisClick ", this.isClick);
+    };
+    MemoryChess_GamePlay.prototype.resetGame = function () {
+        var _this = this;
+        this.nodeItem.removeAllChildren();
+        this.listColor = [];
+        this.listIdColor = [];
+        this.isClick = true;
+        this.isClickItem = false;
+        MemoryChess_Global_1.default.heart = 3;
+        this.randomColor();
+        this.shuffle();
+        this.renItem();
+        this.updateLbHeart();
+        this.scheduleOnce(function () {
+            _this.startCountDown();
+        }, 5.5);
     };
     MemoryChess_GamePlay.prototype.startPlayerTurn = function () {
         console.log("Luot cua nguoi choi ");
@@ -130,12 +158,12 @@ var MemoryChess_GamePlay = /** @class */ (function (_super) {
             var y = startY - row * (item.node.height + cellSpacing);
             item.node.setPosition(x, y);
             var delay = i * 0.2;
-            this.moveChessBack(item.sprItemBack, delay);
+            this.upChessBack(item.sprItemBack, delay);
             this.nodeItem.addChild(item.node);
         }
     };
     MemoryChess_GamePlay.prototype.clickRoll = function () {
-        if (this.isClick || !this.isPlayerTurn) {
+        if (this.isClick) {
             return;
         }
         var idColor = Math.floor(Math.random() * 6) + 1;
@@ -146,14 +174,47 @@ var MemoryChess_GamePlay = /** @class */ (function (_super) {
         this.isClick = true;
         console.log('isClick ', this.isClick);
     };
-    MemoryChess_GamePlay.prototype.moveChessBack = function (node, delay) {
-        var originalY = node.y;
+    MemoryChess_GamePlay.prototype.startCountDown = function () {
+        this.time = 3;
+        this.lbTime.node.active = true;
+        this.updateLbTime();
+        this.schedule(this.countDownTick, 1);
+    };
+    MemoryChess_GamePlay.prototype.countDownTick = function () {
+        if (this.time > 0) {
+            this.time--;
+            this.updateLbTime();
+        }
+        else {
+            this.unschedule(this.countDownTick);
+            this.lbTime.node.active = false;
+            ;
+            this.downChessBack();
+            this.isClick = false;
+        }
+    };
+    MemoryChess_GamePlay.prototype.updateLbTime = function () {
+        this.lbTime.string = this.time + ' ';
+    };
+    MemoryChess_GamePlay.prototype.upChessBack = function (node, delay) {
+        // cc.tween(node)
+        //     .delay(delay)
+        //     .to(0.5, { y: 68 })
+        //     .delay(4)
+        //     .to(0.5, { y: originalY })
+        //     .start();
         cc.tween(node)
             .delay(delay)
             .to(0.5, { y: 68 })
-            .delay(1)
-            .to(0.5, { y: originalY })
             .start();
+    };
+    MemoryChess_GamePlay.prototype.downChessBack = function () {
+        for (var i = 0; i < this.nodeItem.childrenCount; i++) {
+            var node = this.nodeItem.children[i].children[1];
+            cc.tween(node)
+                .to(0.2, { y: 0 })
+                .start();
+        }
     };
     MemoryChess_GamePlay.prototype.moveToCenterAndDestroy = function (node, disableNode) {
         var centerX = 0;
@@ -216,7 +277,11 @@ var MemoryChess_GamePlay = /** @class */ (function (_super) {
         })
             .start();
     };
+    MemoryChess_GamePlay.prototype.updateLbHeart = function () {
+        this.lbHeart.string = MemoryChess_Global_1.default.heart + ' ';
+    };
     MemoryChess_GamePlay.prototype.checkIdColor = function (idColor, node, disableNode) {
+        var _this = this;
         console.log("listColor ", this.listColor);
         if (this.listIdColor[0] == idColor) {
             console.log("dung ");
@@ -229,18 +294,36 @@ var MemoryChess_GamePlay = /** @class */ (function (_super) {
         else {
             console.log("Sai ");
             this.moveToCenterAndReturn(node, disableNode);
+            MemoryChess_Global_1.default.heart--;
+            this.scheduleOnce(function () {
+                _this.updateLbHeart();
+            }, 3);
+        }
+        if (MemoryChess_Global_1.default.heart == 0) {
+            MemoryChess_Global_1.default.gameOver = cc.instantiate(this.prfGameOver).getComponent(MemoryChess_GameOver_1.default);
+            MemoryChess_Global_1.default.gameOver.showLose();
+            this.scheduleOnce(function () {
+                _this.node.addChild(MemoryChess_Global_1.default.gameOver.node);
+            }, 3.5);
         }
         if (this.listColor.length == 0) {
             this.isClick = true;
+            MemoryChess_Global_1.default.gameOver = cc.instantiate(this.prfGameOver).getComponent(MemoryChess_GameOver_1.default);
+            MemoryChess_Global_1.default.gameOver.showWin();
+            this.node.addChild(MemoryChess_Global_1.default.gameOver.node);
             console.log("Win");
         }
         console.log("listColor ", this.listColor);
         this.listIdColor = [];
-        if (this.isPlayerTurn) {
-            this.endPlayerTurn();
-        }
+        // if (this.isPlayerTurn) {
+        //     this.endPlayerTurn();
+        // }
     };
     MemoryChess_GamePlay.prototype.onClickBack = function () {
+        MemoryChess_Global_1.default.soundManager.onItemClicked();
+        this.node.destroy();
+    };
+    MemoryChess_GamePlay.prototype.nodeDestroy = function () {
         this.node.destroy();
     };
     MemoryChess_GamePlay.prototype.start = function () {
@@ -265,6 +348,15 @@ var MemoryChess_GamePlay = /** @class */ (function (_super) {
     __decorate([
         property(cc.AnimationClip)
     ], MemoryChess_GamePlay.prototype, "listAnimation", void 0);
+    __decorate([
+        property(cc.Prefab)
+    ], MemoryChess_GamePlay.prototype, "prfGameOver", void 0);
+    __decorate([
+        property(cc.Label)
+    ], MemoryChess_GamePlay.prototype, "lbTime", void 0);
+    __decorate([
+        property(cc.Label)
+    ], MemoryChess_GamePlay.prototype, "lbHeart", void 0);
     MemoryChess_GamePlay = MemoryChess_GamePlay_1 = __decorate([
         ccclass
     ], MemoryChess_GamePlay);

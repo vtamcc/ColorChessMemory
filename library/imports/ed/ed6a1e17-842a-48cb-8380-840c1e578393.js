@@ -30,26 +30,59 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 var MemoryChess_GamePlay_1 = require("./MemoryChess_GamePlay");
+var MemoryChess_Global_1 = require("./MemoryChess_Global");
+var MemoryChess_SettingView_1 = require("./MemoryChess_SettingView");
 var _a = cc._decorator, ccclass = _a.ccclass, property = _a.property;
 var MemoryChess_Main = /** @class */ (function (_super) {
     __extends(MemoryChess_Main, _super);
     function MemoryChess_Main() {
         var _this = _super !== null && _super.apply(this, arguments) || this;
         _this.prfGamePlay = null;
+        _this.prfSettingView = null;
         return _this;
         // update (dt) {}
     }
     // LIFE-CYCLE CALLBACKS:
-    // onLoad () {}
+    MemoryChess_Main.prototype.onLoad = function () {
+        var savedMusicVolume = localStorage.getItem('musicBgVolume');
+        var saveSoundVolume = localStorage.getItem('soundVolume');
+        this.scheduleOnce(function () {
+            if (savedMusicVolume == null) {
+                MemoryChess_Global_1.default.soundManager.music_bg.volume = MemoryChess_Global_1.default.volumMusic;
+            }
+            else {
+                MemoryChess_Global_1.default.volumMusic = JSON.parse(savedMusicVolume);
+                //console.log("MemoryChess_Global.soundManager.music_bg.volume ",  MemoryChess_Global.volumMusic)
+                MemoryChess_Global_1.default.soundManager.music_bg.volume = MemoryChess_Global_1.default.volumMusic;
+            }
+            if (saveSoundVolume == null) {
+                MemoryChess_Global_1.default.soundManager.audioSound_click.volume = MemoryChess_Global_1.default.volumSound;
+            }
+            else {
+                MemoryChess_Global_1.default.volumSound = JSON.parse(saveSoundVolume);
+                MemoryChess_Global_1.default.soundManager.audioSound_click.volume = MemoryChess_Global_1.default.volumSound;
+                //console.log("MemoryChess_Global.soundManager.audioSound_click.volume ", MemoryChess_Global.volumSound)
+            }
+        }, 0.5);
+    };
     MemoryChess_Main.prototype.clickPlay = function () {
+        MemoryChess_Global_1.default.soundManager.onItemClicked();
         var gamePlay = cc.instantiate(this.prfGamePlay).getComponent(MemoryChess_GamePlay_1.default);
         this.node.addChild(gamePlay.node);
+    };
+    MemoryChess_Main.prototype.clickSetting = function () {
+        MemoryChess_Global_1.default.soundManager.onItemClicked();
+        var setting = cc.instantiate(this.prfSettingView).getComponent(MemoryChess_SettingView_1.default);
+        this.node.addChild(setting.node);
     };
     MemoryChess_Main.prototype.start = function () {
     };
     __decorate([
         property(cc.Prefab)
     ], MemoryChess_Main.prototype, "prfGamePlay", void 0);
+    __decorate([
+        property(cc.Prefab)
+    ], MemoryChess_Main.prototype, "prfSettingView", void 0);
     MemoryChess_Main = __decorate([
         ccclass
     ], MemoryChess_Main);

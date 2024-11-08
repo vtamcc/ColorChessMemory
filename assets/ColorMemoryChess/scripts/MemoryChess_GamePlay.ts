@@ -5,6 +5,7 @@
 // Learn life-cycle callbacks:
 //  - https://docs.cocos.com/creator/2.4/manual/en/scripting/life-cycle-callbacks.html
 
+import MemoryChes_GameOver from "./MemoryChess_GameOver";
 import MemoryChess_Global from "./MemoryChess_Global";
 import MemoryChess_Item from "./MemoryChess_Item";
 
@@ -30,33 +31,67 @@ export default class MemoryChess_GamePlay extends cc.Component {
 
     @property(cc.AnimationClip)
     listAnimation: cc.AnimationClip[] = [];
+
+    @property(cc.Prefab)
+    prfGameOver: cc.Prefab = null;
+
+    @property(cc.Label)
+    lbTime: cc.Label = null;
+
+    @property(cc.Label)
+    lbHeart: cc.Label = null;
     numCircles = 3;
     listColor = [];
     listIdColor = [];
-    isClick = false;
+    isClick = true;
     isClickItem = false;
     isPlayerTurn = true;
+    time = 3;
     // LIFE-CYCLE CALLBACKS:
 
     onLoad() {
+        console.log("heart ",MemoryChess_Global.heart);
         MemoryChess_GamePlay.instance = this;
         this.randomColor();
         this.shuffle();
         this.renItem();
-        this.startPlayerTurn();
+        this.updateLbHeart();
+        //this.startPlayerTurn();
+        this.scheduleOnce( () => {
+            this.startCountDown();
+        },5.5)
+        console.log("iisClick ", this.isClick);
+       
     }
 
+    resetGame() {
+        this.nodeItem.removeAllChildren();
+        this.listColor = [];
+        this.listIdColor = [];
+        this.isClick = true;
+        this.isClickItem = false;
+        MemoryChess_Global.heart = 3;
+        this.randomColor();
+        this.shuffle();
+        this.renItem();
+        this.updateLbHeart();
+        this.scheduleOnce( () => {
+            this.startCountDown();
+        },5.5)
+
+    }
     startPlayerTurn() {
         console.log("Luot cua nguoi choi ");
         this.isPlayerTurn = true;
         this.isClick = false;
+       
     }
 
     endPlayerTurn() {
         this.isClick = true;
         this.scheduleOnce(() => {
             this.startTurnBot();
-        },2.5)
+        }, 2.5)
     }
 
     startTurnBot() {
@@ -65,7 +100,7 @@ export default class MemoryChess_GamePlay extends cc.Component {
         this.clickRoll();
         console.log("lengt ", this.node.children.length);
         let ramdomIndex = Math.floor(Math.random() * this.nodeItem.children.length);
-    } 
+    }
 
     randomColor() {
         for (let i = 0; i < MemoryChess_Global.arrColor.length; i++) {
@@ -124,14 +159,14 @@ export default class MemoryChess_GamePlay extends cc.Component {
             let x = startX + col * (item.node.width + cellSpacing);
             let y = startY - row * (item.node.height + cellSpacing);
             item.node.setPosition(x, y);
-            let delay = i * 0.2; 
-            this.moveChessBack(item.sprItemBack,delay);
+            let delay = i * 0.2;
+            this.upChessBack(item.sprItemBack, delay);
             this.nodeItem.addChild(item.node);
         }
     }
 
     clickRoll() {
-        if (this.isClick || !this.isPlayerTurn) {
+        if (this.isClick) {
             return;
         }
         let idColor = Math.floor(Math.random() * 6) + 1;
@@ -140,21 +175,56 @@ export default class MemoryChess_GamePlay extends cc.Component {
         console.log("idColor ", this.listIdColor);
         this.isClickItem = true;
         this.isClick = true;
-
-
         console.log('isClick ', this.isClick);
 
 
     }
-    
-    moveChessBack(node, delay) {
-        let originalY = node.y;
+
+    startCountDown() {
+        this.time = 3;
+        this.lbTime.node.active = true;
+        
+        this.updateLbTime();
+        this.schedule(this.countDownTick, 1);
+    }
+
+    countDownTick() {
+        if (this.time > 0) {
+            this.time--;
+            this.updateLbTime();
+            
+        } else {
+            this.unschedule(this.countDownTick);
+            this.lbTime.node.active = false;;
+            this.downChessBack();
+            this.isClick = false;
+        }
+    }
+
+    updateLbTime() {
+        
+        this.lbTime.string = this.time + ' ';
+    }
+    upChessBack(node, delay) {
+        // cc.tween(node)
+        //     .delay(delay)
+        //     .to(0.5, { y: 68 })
+        //     .delay(4)
+        //     .to(0.5, { y: originalY })
+        //     .start();
         cc.tween(node)
             .delay(delay)
             .to(0.5, { y: 68 })
-            .delay(1)
-            .to(0.5, { y: originalY })
             .start();
+    }
+
+    downChessBack() {
+        for(let i = 0; i < this.nodeItem.childrenCount; i++) {
+            let node = this.nodeItem.children[i].children[1];
+            cc.tween(node)
+            .to(0.2, {y: 0})
+            .start();
+        }
     }
 
     moveToCenterAndDestroy(node, disableNode) {
@@ -172,21 +242,21 @@ export default class MemoryChess_GamePlay extends cc.Component {
         //     .start();
 
         cc.tween(node)
-        .to(0.5, { x: centerX, y: centerY, scale: 1.5 })
-        .call(() => {
-            
-            cc.tween(disableNode)
-                .to(0.5, { y: disableNode.y + 65 })
-                .delay(0.5)
-                .to(0.5, {y: 0})
-                .delay(0.8) 
-                .call(() => {
-                    disableNode.active = false;  
-                    node.destroy();
-                })
-                .start();
-        })
-        .start();
+            .to(0.5, { x: centerX, y: centerY, scale: 1.5 })
+            .call(() => {
+
+                cc.tween(disableNode)
+                    .to(0.5, { y: disableNode.y + 65 })
+                    .delay(0.5)
+                    .to(0.5, { y: 0 })
+                    .delay(0.8)
+                    .call(() => {
+                        disableNode.active = false;
+                        node.destroy();
+                    })
+                    .start();
+            })
+            .start();
     }
 
 
@@ -207,25 +277,30 @@ export default class MemoryChess_GamePlay extends cc.Component {
         //     .to(0.5, { x: originalX, y: originalY, scale: 1.0 })
         //     .start();
         cc.tween(node)
-        .to(0.5, { x: centerX, y: centerY, scale: 1.5 })
-        .delay(0.5)
-        .call(() => {
-            cc.tween(disableNode)
-                .to(0.5, { y: disableNode.y + 65 })
-                .delay(0.5)
-                .to(0.5, { y: 0})
-                .start();
-        })
-        .delay(1.5)
-        .to(0.5, { x: originalX, y: originalY, scale: 1.0 })
-        .call(() => {
-            node.zIndex = 1;
-        })
-        .start();
+            .to(0.5, { x: centerX, y: centerY, scale: 1.5 })
+            .delay(0.5)
+            .call(() => {
+                cc.tween(disableNode)
+                    .to(0.5, { y: disableNode.y + 65 })
+                    .delay(0.5)
+                    .to(0.5, { y: 0 })
+                    .start();
+            })
+            .delay(1.5)
+            .to(0.5, { x: originalX, y: originalY, scale: 1.0 })
+            .call(() => {
+                node.zIndex = 1;
+            })
+            .start();
+
+
+    }
+    updateLbHeart() {
+        this.lbHeart.string = MemoryChess_Global.heart + ' '
     }
 
     checkIdColor(idColor, node, disableNode) {
-       
+
         console.log("listColor ", this.listColor);
         if (this.listIdColor[0] == idColor) {
             console.log("dung ");
@@ -239,12 +314,29 @@ export default class MemoryChess_GamePlay extends cc.Component {
         } else {
             console.log("Sai ");
             this.moveToCenterAndReturn(node, disableNode);
+            MemoryChess_Global.heart--;
+            this.scheduleOnce(() => {
+                this.updateLbHeart();
+            },3)
+            
+        }
+
+        if(MemoryChess_Global.heart == 0) {
+            MemoryChess_Global.gameOver = cc.instantiate(this.prfGameOver).getComponent(MemoryChes_GameOver);
+            MemoryChess_Global.gameOver.showLose();
+            this.scheduleOnce(() => {
+                this.node.addChild(MemoryChess_Global.gameOver.node);
+            },3.5)
+            
         }
 
         if (this.listColor.length == 0) {
             this.isClick = true;
+            MemoryChess_Global.gameOver = cc.instantiate(this.prfGameOver).getComponent(MemoryChes_GameOver);
+            MemoryChess_Global.gameOver.showWin();
+            this.node.addChild(MemoryChess_Global.gameOver.node);
             console.log("Win");
-          
+
         }
 
 
@@ -252,16 +344,20 @@ export default class MemoryChess_GamePlay extends cc.Component {
         console.log("listColor ", this.listColor);
         this.listIdColor = [];
 
-        if (this.isPlayerTurn) {
-            this.endPlayerTurn();
-        }
+        // if (this.isPlayerTurn) {
+        //     this.endPlayerTurn();
+        // }
     }
 
-    
+
     onClickBack() {
+        MemoryChess_Global.soundManager.onItemClicked();
         this.node.destroy();
     }
 
+    nodeDestroy() {
+        this.node.destroy();
+    }
     start() {
 
     }

@@ -20,6 +20,11 @@ var _a = cc._decorator, ccclass = _a.ccclass, property = _a.property;
 var MemoryChess_Global = /** @class */ (function () {
     function MemoryChess_Global() {
     }
+    MemoryChess_Global.soundManager = null;
+    MemoryChess_Global.gameOver = null;
+    MemoryChess_Global.volumMusic = 1;
+    MemoryChess_Global.heart = 3;
+    MemoryChess_Global.volumSound = 1;
     MemoryChess_Global.arrColor = [1, 2, 3, 4, 5, 6];
     MemoryChess_Global = __decorate([
         ccclass
